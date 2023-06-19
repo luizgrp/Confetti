@@ -107,6 +107,7 @@ fun SessionListViewPreview() {
     val sessionTime = LocalDateTime(2022, 12, 25, 12, 30)
 
     ConfettiThemeFixed {
+        val now = java.time.LocalDateTime.of(2022, 1, 1, 1, 1).toKotlinLocalDateTime()
         SessionsScreen(
             uiState = QueryResult.Success(
                 SessionsUiState(
@@ -123,11 +124,12 @@ fun SessionListViewPreview() {
                                     sessionTime,
                                     sessionTime,
                                     listOf(),
+                                    now
                                 )
                             )
                         )
                     ),
-                    now = java.time.LocalDateTime.of(2022, 1, 1, 1, 1).toKotlinLocalDateTime()
+                    now = now
                 )
             ),
             sessionSelected = {},

@@ -22,6 +22,7 @@ import dev.johnoreilly.confetti.wear.home.HomeUiState
 import dev.johnoreilly.confetti.wear.preview.TestFixtures
 import dev.johnoreilly.confetti.wear.preview.TestFixtures.kotlinConf2023
 import dev.johnoreilly.confetti.wear.screenshots.ScreenshotTest
+import dev.johnoreilly.confetti.wear.ui.model.ConferenceDayUiModel
 import kotlinx.datetime.toKotlinLocalDateTime
 import org.junit.Test
 import java.time.LocalDateTime
@@ -44,7 +45,9 @@ class ConferenceHomeScreenTest : ScreenshotTest() {
                     HomeUiState(
                         kotlinConf2023.id,
                         kotlinConf2023.name,
-                        kotlinConf2023.days,
+                        kotlinConf2023.days.map {
+                            ConferenceDayUiModel(kotlinConf2023.id, it)
+                        },
                         QueryResult.None
                     )
                 ),
@@ -70,7 +73,9 @@ class ConferenceHomeScreenTest : ScreenshotTest() {
                     HomeUiState(
                         kotlinConf2023.id,
                         kotlinConf2023.name,
-                        kotlinConf2023.days,
+                        kotlinConf2023.days.map {
+                            ConferenceDayUiModel(kotlinConf2023.id, it)
+                        },
                         bookmarksUiState = QueryResult.Success(
                             BookmarksUiState(
                                 kotlinConf2023.id,
@@ -115,7 +120,9 @@ class ConferenceHomeScreenTest : ScreenshotTest() {
                     HomeUiState(
                         kotlinConf2023.id,
                         kotlinConf2023.name,
-                        kotlinConf2023.days,
+                        kotlinConf2023.days.map {
+                            ConferenceDayUiModel(kotlinConf2023.id, it)
+                        },
                         QueryResult.None
                     )
                 ),

@@ -17,7 +17,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.ExperimentalWearMaterialApi
 import androidx.wear.compose.material.MaterialTheme
@@ -27,7 +26,9 @@ import androidx.wear.compose.material.placeholder
 import androidx.wear.compose.material.rememberPlaceholderState
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.composables.PlaceholderChip
-import com.google.android.horologist.compose.layout.ScalingLazyColumn
+import com.google.android.horologist.composables.Section
+import com.google.android.horologist.composables.SectionedList
+import com.google.android.horologist.composables.SectionedListScope
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import com.google.android.horologist.compose.material.Button
@@ -41,7 +42,7 @@ import dev.johnoreilly.confetti.wear.components.SectionHeader
 import dev.johnoreilly.confetti.wear.components.SessionCard
 import dev.johnoreilly.confetti.wear.preview.TestFixtures
 import dev.johnoreilly.confetti.wear.ui.ConfettiThemeFixed
-import dev.johnoreilly.confetti.wear.ui.model.SessionDetailsUiModel
+import dev.johnoreilly.confetti.wear.ui.model.ConferenceDayUiModel
 import dev.johnoreilly.confetti.wear.ui.previews.WearPreviewDevices
 import dev.johnoreilly.confetti.wear.ui.previews.WearPreviewFontSizes
 import kotlinx.datetime.toJavaLocalDate
@@ -60,84 +61,160 @@ fun HomeScreen(
 ) {
     val dayFormatter = remember { DateTimeFormatter.ofPattern("cccc") }
 
-    ScalingLazyColumn(
+    SectionedList(
         modifier = Modifier.fillMaxSize(),
         columnState = columnState,
     ) {
-        item {
-            if (uiState is QueryResult.Success) {
-                ConferenceTitle(uiState.result.conferenceName)
-            } else if (uiState is QueryResult.Loading) {
-                val chipPlaceholderState = rememberPlaceholderState { false }
-                SectionHeader(
-                    "",
-                    modifier = Modifier
-                        .fillMaxWidth(0.75f)
-                        .placeholder(chipPlaceholderState)
-                )
+        titleSection(uiState)
+
+        bookmarksSection(uiState, sessionSelected, onBookmarksClick)
+
+        conferenceDaysSection(uiState, daySelected, dayFormatter)
+
+        bottomMenuSection(onSettingsClick)
+    }
+}
+
+private fun SectionedListScope.titleSection(uiState: QueryResult<HomeUiState>) {
+    val titleSectionState = when (uiState) {
+        is QueryResult.Success -> Section.State.Loaded(listOf(uiState.result.conferenceName))
+        QueryResult.Loading -> Section.State.Loading
+        is QueryResult.Error -> Section.State.Failed
+        QueryResult.None -> Section.State.Empty
+    }
+
+    section(state = titleSectionState) {
+        loaded { conferenceName ->
+            ConferenceTitle(conferenceName)
+        }
+
+        loading {
+            val chipPlaceholderState = rememberPlaceholderState { false }
+            SectionHeader(
+                "",
+                modifier = Modifier
+                    .fillMaxWidth(0.75f)
+                    .placeholder(chipPlaceholderState)
+            )
+        }
+    }
+}
+
+private fun SectionedListScope.bookmarksSection(
+    uiState: QueryResult<HomeUiState>,
+    sessionSelected: (SessionDetailsKey) -> Unit,
+    onBookmarksClick: (String) -> Unit
+) {
+    val bookmarksSectionState = when (uiState) {
+        is QueryResult.Success -> {
+            when (val bookmarksUiStateResult = uiState.result.bookmarksUiState) {
+                is QueryResult.Success -> {
+                    val bookmarksUiState = bookmarksUiStateResult.result
+                    if (bookmarksUiState.hasUpcomingBookmarks) {
+                        Section.State.Loaded(bookmarksUiState.upcoming.take(3))
+                    } else {
+                        Section.State.Empty
+                    }
+                }
+
+                QueryResult.Loading -> Section.State.Loading
+                is QueryResult.Error -> Section.State.Failed
+                QueryResult.None -> Section.State.Failed // handling "None" as a failure
             }
         }
 
-        if (uiState !is QueryResult.Success || uiState.result.bookmarksUiState !is QueryResult.None) {
-            item {
+        QueryResult.Loading -> Section.State.Loading
+        is QueryResult.Error -> Section.State.Failed
+        QueryResult.None -> Section.State.Failed // handling "None" as a failure
+    }
+
+    section(
+        state = bookmarksSectionState,
+        displayFooterOnlyOnLoadedState = false
+    ) {
+        header {
+            if (bookmarksSectionState !is Section.State.Failed) {
                 SectionHeader(stringResource(R.string.home_bookmarked_sessions))
             }
         }
 
-        if (uiState is QueryResult.Success) {
-            val homeUiState = uiState.result
-
-            if (homeUiState.bookmarksUiState is QueryResult.Success) {
-                val bookmarksUiState = homeUiState.bookmarksUiState.result
-                val now = bookmarksUiState.now
-
-                items(bookmarksUiState.upcoming.take(3)) { session: SessionDetailsUiModel ->
-                    key(session.id) {
-                        SessionCard(session, sessionSelected = {
-                            sessionSelected(SessionDetailsKey(homeUiState.conference, it))
-                        }, now)
+        loaded { session ->
+            key(session.id) {
+                SessionCard(session, sessionSelected = {
+                    if (uiState is QueryResult.Success) {
+                        sessionSelected(SessionDetailsKey(uiState.result.conference, it))
                     }
-                }
-
-                if (!bookmarksUiState.hasUpcomingBookmarks) {
-                    item {
-                        Text(stringResource(id = R.string.no_upcoming))
-                    }
-                }
-
-                item {
-                    OutlinedChip(
-                        label = { Text(stringResource(id = R.string.all_bookmarks)) },
-                        onClick = {
-                            onBookmarksClick(homeUiState.conference)
-                        }
-                    )
-                }
-            } else if (uiState is QueryResult.Loading) {
-                // TODO placeholders
+                }, session.bookmarkNow)
             }
         }
 
-        item {
-            SectionHeader(stringResource(id = R.string.conference_days))
+        loading {
+            // TODO placeholders
         }
-        if (uiState is QueryResult.Success) {
-            items(uiState.result.confDates.size) {
-                // TODO format date
-                val date = uiState.result.confDates[it]
-                Chip(
-                    label = dayFormatter.format(date.toJavaLocalDate()),
-                    onClick = { daySelected(ConferenceDayKey(uiState.result.conference, date)) },
-                    colors = ChipDefaults.secondaryChipColors()
+
+        empty {
+            Text(stringResource(id = R.string.no_upcoming))
+        }
+
+        footer {
+            if (bookmarksSectionState is Section.State.Loaded ||
+                bookmarksSectionState is Section.State.Empty
+            ) {
+                OutlinedChip(
+                    label = { Text(stringResource(id = R.string.all_bookmarks)) },
+                    onClick = {
+                        if (uiState is QueryResult.Success) {
+                            onBookmarksClick(uiState.result.conference)
+                        }
+                    }
                 )
             }
-        } else if (uiState is QueryResult.Loading) {
-            items(2) {
-                PlaceholderChip(contentDescription = "")
-            }
+        }
+    }
+}
+
+private fun SectionedListScope.conferenceDaysSection(
+    uiState: QueryResult<HomeUiState>,
+    daySelected: (ConferenceDayKey) -> Unit,
+    dayFormatter: DateTimeFormatter
+) {
+    val conferenceDaysSectionState = when (uiState) {
+        is QueryResult.Success -> Section.State.Loaded(uiState.result.confDates)
+        QueryResult.Loading -> Section.State.Loading
+        is QueryResult.Error -> Section.State.Failed
+        QueryResult.None -> Section.State.Empty
+    }
+
+    section(state = conferenceDaysSectionState) {
+        header {
+            SectionHeader(stringResource(id = R.string.conference_days))
         }
 
-        item {
+        loaded { conferenceDay ->
+            // TODO format date
+            Chip(
+                label = dayFormatter.format(conferenceDay.date.toJavaLocalDate()),
+                onClick = {
+                    daySelected(
+                        ConferenceDayKey(
+                            conferenceDay.conference,
+                            conferenceDay.date
+                        )
+                    )
+                },
+                colors = ChipDefaults.secondaryChipColors()
+            )
+        }
+
+        loading(count = 2) {
+            PlaceholderChip(contentDescription = "")
+        }
+    }
+}
+
+private fun SectionedListScope.bottomMenuSection(onSettingsClick: () -> Unit) {
+    section {
+        loaded {
             Button(
                 imageVector = Icons.Default.Settings,
                 contentDescription = stringResource(R.string.home_settings_content_description),
@@ -172,7 +249,9 @@ fun HomeListViewPreview() {
                 HomeUiState(
                     conference = TestFixtures.kotlinConf2023.id,
                     conferenceName = TestFixtures.kotlinConf2023.name,
-                    confDates = TestFixtures.kotlinConf2023.days,
+                    confDates = TestFixtures.kotlinConf2023.days.map {
+                        ConferenceDayUiModel(TestFixtures.kotlinConf2023.id, it)
+                    },
                     bookmarksUiState = QueryResult.Success(
                         BookmarksUiState(
                             conference = TestFixtures.kotlinConf2023.id,

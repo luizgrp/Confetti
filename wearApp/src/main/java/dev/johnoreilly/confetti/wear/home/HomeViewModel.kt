@@ -14,6 +14,7 @@ import dev.johnoreilly.confetti.utils.QueryResult
 import dev.johnoreilly.confetti.wear.bookmarks.BookmarksUiState
 import dev.johnoreilly.confetti.wear.bookmarks.BookmarksViewModel.Companion.toUiState
 import dev.johnoreilly.confetti.wear.home.navigation.ConferenceHomeDestination
+import dev.johnoreilly.confetti.wear.ui.model.ConferenceDayUiModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +25,7 @@ import kotlinx.coroutines.flow.stateIn
 
 class HomeViewModel(
     savedStateHandle: SavedStateHandle,
-    private val repository: ConfettiRepository,
+    repository: ConfettiRepository,
     authentication: Authentication,
 ) : ViewModel() {
     private val conference: String =
@@ -77,7 +78,7 @@ class HomeViewModel(
             HomeUiState(
                 config.id,
                 config.name,
-                config.days,
+                config.days.map { ConferenceDayUiModel(config.id, it) },
                 QueryResult.None
             )
     }

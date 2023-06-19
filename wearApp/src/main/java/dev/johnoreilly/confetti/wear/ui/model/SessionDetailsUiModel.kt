@@ -9,5 +9,6 @@ data class SessionDetailsUiModel(
     val isBreak: Boolean,
     val startsAt: LocalDateTime,
     val endsAt: LocalDateTime,
-    val speakers: List<SpeakerDetailsUiModel>
+    val speakers: List<SpeakerDetailsUiModel>,
+    val bookmarkNow: LocalDateTime
 )

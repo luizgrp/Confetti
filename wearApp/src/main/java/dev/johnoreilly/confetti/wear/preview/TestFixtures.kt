@@ -135,7 +135,7 @@ The talk will cover
         __typename = "Session"
     )
 
-    val sessionDetailsUiModel = sessionDetails.toSessionDetailsUiModel()
+    val sessionDetailsUiModel = sessionDetails.toSessionDetailsUiModel(LocalDateTime.parse("2023-04-13T14:10"))
 
     val MobileTheme = Theme(
         primary = 0xffffa8ffL.toInt(),

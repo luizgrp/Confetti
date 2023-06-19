@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.johnoreilly.confetti.ConfettiRepository
 import dev.johnoreilly.confetti.GetSessionsQuery
-import dev.johnoreilly.confetti.fragment.SessionDetails
 import dev.johnoreilly.confetti.navigation.ConferenceDayKey
 import dev.johnoreilly.confetti.toTimeZone
 import dev.johnoreilly.confetti.utils.ClientQuery.toUiState
@@ -35,9 +34,10 @@ class SessionsViewModel(
 
     private fun buildUiState(data: GetSessionsQuery.Data): SessionsUiState {
         val sessionList = data.sessions.nodes.map { it.sessionDetails }
+        val now = LocalDateTime.nowAtTimeZone(data.config.timezone.toTimeZone())
         val sessions = sessionList.filter {
             it.startsAt.date == conferenceDay.date
-        }.map(SessionDetails::toSessionDetailsUiModel)
+        }.map { it.toSessionDetailsUiModel(now) }
         val sessionsByTime =
             sessions.groupByTo(TreeMap()) { it.startsAt }.map {
                 SessionAtTime(it.key, it.value)
@@ -45,7 +45,7 @@ class SessionsViewModel(
         return SessionsUiState(
             conferenceDay,
             sessionsByTime,
-            LocalDateTime.nowAtTimeZone(data.config.timezone.toTimeZone())
+            now
         )
     }
 }

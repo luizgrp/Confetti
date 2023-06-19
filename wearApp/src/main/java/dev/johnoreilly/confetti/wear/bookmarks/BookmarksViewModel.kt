@@ -9,7 +9,6 @@ import com.apollographql.apollo3.cache.normalized.FetchPolicy
 import dev.johnoreilly.confetti.ConfettiRepository
 import dev.johnoreilly.confetti.GetBookmarkedSessionsQuery
 import dev.johnoreilly.confetti.auth.Authentication
-import dev.johnoreilly.confetti.fragment.SessionDetails
 import dev.johnoreilly.confetti.toTimeZone
 import dev.johnoreilly.confetti.utils.ClientQuery.toUiState
 import dev.johnoreilly.confetti.utils.QueryResult
@@ -73,8 +72,8 @@ class BookmarksViewModel(
 
             return BookmarksUiState(
                 this.config.id,
-                upcoming.map(SessionDetails::toSessionDetailsUiModel),
-                past.map(SessionDetails::toSessionDetailsUiModel),
+                upcoming.map { it.toSessionDetailsUiModel(now) },
+                past.map { it.toSessionDetailsUiModel(now) },
                 now
             )
         }
