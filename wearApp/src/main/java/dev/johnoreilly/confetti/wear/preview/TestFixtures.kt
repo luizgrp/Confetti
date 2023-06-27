@@ -5,6 +5,7 @@ import dev.johnoreilly.confetti.GetConferencesQuery
 import dev.johnoreilly.confetti.fragment.SessionDetails
 import dev.johnoreilly.confetti.fragment.SpeakerDetails
 import dev.johnoreilly.confetti.wear.proto.Theme
+import dev.johnoreilly.confetti.wear.ui.mapper.toSessionDetailsUiModel
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 
@@ -129,6 +130,8 @@ The talk will cover
         tags = listOf(),
         __typename = "Session"
     )
+
+    val sessionDetailsUiModel = sessionDetails.toSessionDetailsUiModel()
 
     val MobileTheme = Theme(
         primary = 0xffffa8ffL.toInt(),

@@ -5,7 +5,6 @@ package dev.johnoreilly.confetti.wear.bookmarks
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -120,7 +119,7 @@ fun BookmarksPreview() {
             uiState = QueryResult.Success(
                 BookmarksUiState(
                     conference = TestFixtures.kotlinConf2023.id,
-                    upcoming = listOf(TestFixtures.sessionDetails),
+                    upcoming = listOf(TestFixtures.sessionDetailsUiModel),
                     past = listOf(),
                     now = LocalDateTime.of(2022, 1, 1, 1, 1).toKotlinLocalDateTime()
                 )

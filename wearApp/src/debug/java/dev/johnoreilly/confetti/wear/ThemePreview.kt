@@ -65,7 +65,7 @@ fun ThemePreview() {
         //            }
         item {
             SessionCard(
-                session = TestFixtures.sessionDetails,
+                session = TestFixtures.sessionDetailsUiModel,
                 sessionSelected = {},
                 currentTime = now
             )

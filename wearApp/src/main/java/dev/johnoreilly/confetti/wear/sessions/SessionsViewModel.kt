@@ -5,12 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.johnoreilly.confetti.ConfettiRepository
 import dev.johnoreilly.confetti.GetSessionsQuery
+import dev.johnoreilly.confetti.fragment.SessionDetails
 import dev.johnoreilly.confetti.navigation.ConferenceDayKey
 import dev.johnoreilly.confetti.toTimeZone
 import dev.johnoreilly.confetti.utils.ClientQuery.toUiState
 import dev.johnoreilly.confetti.utils.QueryResult
 import dev.johnoreilly.confetti.utils.nowAtTimeZone
 import dev.johnoreilly.confetti.wear.sessions.navigation.SessionsDestination
+import dev.johnoreilly.confetti.wear.ui.mapper.toSessionDetailsUiModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -35,7 +37,7 @@ class SessionsViewModel(
         val sessionList = data.sessions.nodes.map { it.sessionDetails }
         val sessions = sessionList.filter {
             it.startsAt.date == conferenceDay.date
-        }
+        }.map(SessionDetails::toSessionDetailsUiModel)
         val sessionsByTime =
             sessions.groupByTo(TreeMap()) { it.startsAt }.map {
                 SessionAtTime(it.key, it.value)

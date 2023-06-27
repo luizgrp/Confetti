@@ -5,7 +5,6 @@ package dev.johnoreilly.confetti.wear.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,11 +27,11 @@ import androidx.wear.compose.material.TitleCard
 import com.google.android.horologist.compose.tools.ThemeValues
 import com.google.android.horologist.compose.tools.WearPreview
 import dev.johnoreilly.confetti.R
-import dev.johnoreilly.confetti.fragment.SessionDetails
-import dev.johnoreilly.confetti.isBreak
 import dev.johnoreilly.confetti.wear.preview.ConfettiPreviewThemes
 import dev.johnoreilly.confetti.wear.preview.TestFixtures
 import dev.johnoreilly.confetti.wear.ui.ConfettiThemeFixed
+import dev.johnoreilly.confetti.wear.ui.model.SessionDetailsUiModel
+import dev.johnoreilly.confetti.wear.ui.model.SpeakerDetailsUiModel
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toJavaLocalDateTime
 import java.time.format.DateTimeFormatter
@@ -40,7 +39,7 @@ import java.time.format.FormatStyle
 
 @Composable
 fun SessionCard(
-    session: SessionDetails,
+    session: SessionDetailsUiModel,
     sessionSelected: (sessionId: String) -> Unit,
     currentTime: LocalDateTime,
     modifier: Modifier = Modifier,
@@ -48,7 +47,7 @@ fun SessionCard(
         SessionTime(session, currentTime)
     }
 ) {
-    if (session.isBreak()) {
+    if (session.isBreak) {
         Text(session.title, modifier = modifier)
     } else {
         TitleCard(
@@ -70,7 +69,7 @@ fun SessionCard(
                     LocalContentColor provides MaterialTheme.colors.onSurfaceVariant,
                     LocalTextStyle provides MaterialTheme.typography.caption1,
                 ) {
-                    Text(session.room?.name ?: "", modifier = Modifier.weight(1f))
+                    Text(session.room ?: "", modifier = Modifier.weight(1f))
 
                     timeDisplay()
                 }
@@ -80,11 +79,11 @@ fun SessionCard(
 }
 
 @Composable
-fun SpeakerLabel(speaker: SessionDetails.Speaker) {
+fun SpeakerLabel(speaker: SpeakerDetailsUiModel) {
     Row {
         // TODO add avatar
         Text(
-            speaker.speakerDetails.name,
+            speaker.name,
             style = MaterialTheme.typography.caption2,
             fontWeight = FontWeight.Light,
             maxLines = 1,
@@ -95,7 +94,7 @@ fun SpeakerLabel(speaker: SessionDetails.Speaker) {
 
 @Composable
 fun SessionTime(
-    session: SessionDetails,
+    session: SessionDetailsUiModel,
     currentTime: LocalDateTime
 ) {
     val timeFormatted = remember { DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT) }
@@ -114,7 +113,7 @@ fun SessionCardPreview(
     Box(modifier = Modifier.width(221.dp)) {
         ConfettiThemeFixed(colors = themeValues.colors) {
             SessionCard(
-                session = TestFixtures.sessionDetails,
+                session = TestFixtures.sessionDetailsUiModel,
                 sessionSelected = {},
                 currentTime = LocalDateTime.parse("2020-01-01T01:01:01")
             )

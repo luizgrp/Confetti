@@ -9,6 +9,7 @@ import com.apollographql.apollo3.cache.normalized.FetchPolicy
 import dev.johnoreilly.confetti.ConfettiRepository
 import dev.johnoreilly.confetti.GetBookmarkedSessionsQuery
 import dev.johnoreilly.confetti.auth.Authentication
+import dev.johnoreilly.confetti.fragment.SessionDetails
 import dev.johnoreilly.confetti.toTimeZone
 import dev.johnoreilly.confetti.utils.ClientQuery.toUiState
 import dev.johnoreilly.confetti.utils.QueryResult
@@ -16,6 +17,7 @@ import dev.johnoreilly.confetti.utils.nowAtTimeZone
 import dev.johnoreilly.confetti.wear.bookmarks.navigation.BookmarksDestination
 import dev.johnoreilly.confetti.wear.complication.ComplicationUpdater
 import dev.johnoreilly.confetti.wear.tile.TileUpdater
+import dev.johnoreilly.confetti.wear.ui.mapper.toSessionDetailsUiModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -69,7 +71,12 @@ class BookmarksViewModel(
                 it.endsAt > now
             }
 
-            return BookmarksUiState(this.config.id, upcoming, past, now)
+            return BookmarksUiState(
+                this.config.id,
+                upcoming.map(SessionDetails::toSessionDetailsUiModel),
+                past.map(SessionDetails::toSessionDetailsUiModel),
+                now
+            )
         }
 
     }

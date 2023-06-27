@@ -2,6 +2,7 @@ package dev.johnoreilly.confetti.wear.sessions
 
 import dev.johnoreilly.confetti.fragment.SessionDetails
 import dev.johnoreilly.confetti.navigation.ConferenceDayKey
+import dev.johnoreilly.confetti.wear.ui.model.SessionDetailsUiModel
 import kotlinx.datetime.LocalDateTime
 
 data class SessionsUiState(
@@ -12,5 +13,5 @@ data class SessionsUiState(
 
 data class SessionAtTime(
     val time: LocalDateTime,
-    val sessions: List<SessionDetails>
+    val sessions: List<SessionDetailsUiModel>
 )

@@ -178,7 +178,7 @@ fun HomeListViewPreview() {
                 BookmarksUiState(
                     conference = TestFixtures.kotlinConf2023.id,
                     upcoming = listOf(
-                        TestFixtures.sessionDetails
+                        TestFixtures.sessionDetailsUiModel
                     ),
                     past = listOf(),
                     now = LocalDateTime.of(2022, 1, 1, 1, 1).toKotlinLocalDateTime()

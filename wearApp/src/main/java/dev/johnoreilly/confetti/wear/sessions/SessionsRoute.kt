@@ -15,14 +15,13 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import dev.johnoreilly.confetti.BuildConfig
-import dev.johnoreilly.confetti.fragment.SessionDetails
 import dev.johnoreilly.confetti.navigation.ConferenceDayKey
 import dev.johnoreilly.confetti.navigation.SessionDetailsKey
-import dev.johnoreilly.confetti.type.Session
 import dev.johnoreilly.confetti.utils.QueryResult
 import dev.johnoreilly.confetti.wear.components.SectionHeader
 import dev.johnoreilly.confetti.wear.components.SessionCard
 import dev.johnoreilly.confetti.wear.ui.ConfettiThemeFixed
+import dev.johnoreilly.confetti.wear.ui.model.SessionDetailsUiModel
 import dev.johnoreilly.confetti.wear.ui.previews.WearPreviewDevices
 import dev.johnoreilly.confetti.wear.ui.previews.WearPreviewFontSizes
 import kotlinx.datetime.LocalDateTime
@@ -116,18 +115,14 @@ fun SessionListViewPreview() {
                         SessionAtTime(
                             sessionTime,
                             listOf(
-                                SessionDetails(
+                                SessionDetailsUiModel(
                                     "1",
                                     "Wear it's at",
-                                    "Talk",
+                                    "Main Hall",
+                                    false,
                                     sessionTime,
                                     sessionTime,
-                                    "Be aWear of what's coming",
-                                    "en",
                                     listOf(),
-                                    SessionDetails.Room("Main Hall"),
-                                    listOf(),
-                                    Session.type.name
                                 )
                             )
                         )
