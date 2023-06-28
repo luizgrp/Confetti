@@ -24,17 +24,15 @@ fun HomeRoute(
     viewModel: HomeViewModel = getViewModel()
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-    val bookmarksUiState by viewModel.bookmarksUiState.collectAsStateWithLifecycle()
 
     if (!BuildConfig.DEBUG) {
         ReportDrawnWhen {
-            uiState !is QueryResult.Loading && bookmarksUiState !is QueryResult.Loading
+            uiState !is QueryResult.Loading
         }
     }
 
     HomeScreen(
         uiState = uiState,
-        bookmarksUiState = bookmarksUiState,
         sessionSelected = {
             navigateToSession(it)
         },

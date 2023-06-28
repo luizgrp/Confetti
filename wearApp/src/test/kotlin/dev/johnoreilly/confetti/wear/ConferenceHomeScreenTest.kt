@@ -35,7 +35,7 @@ class ConferenceHomeScreenTest : ScreenshotTest() {
     fun conferenceHomeScreen() {
         takeScrollableScreenshot(
             timeTextMode = TimeTextMode.OnTop,
-            checks = { _ ->
+            checks = {
                 rule.onNodeWithText("KotlinConf 2023").assertIsDisplayed()
             }
         ) { columnState ->
@@ -45,9 +45,9 @@ class ConferenceHomeScreenTest : ScreenshotTest() {
                         kotlinConf2023.id,
                         kotlinConf2023.name,
                         kotlinConf2023.days,
+                        QueryResult.None
                     )
                 ),
-                bookmarksUiState = QueryResult.None,
                 sessionSelected = {},
                 daySelected = {},
                 onSettingsClick = {},
@@ -61,7 +61,7 @@ class ConferenceHomeScreenTest : ScreenshotTest() {
     fun conferenceHomeScreenWithBookmarks() {
         takeScrollableScreenshot(
             timeTextMode = TimeTextMode.OnTop,
-            checks = { _ ->
+            checks = {
                 rule.onNodeWithText("KotlinConf 2023").assertIsDisplayed()
             }
         ) { columnState ->
@@ -71,17 +71,17 @@ class ConferenceHomeScreenTest : ScreenshotTest() {
                         kotlinConf2023.id,
                         kotlinConf2023.name,
                         kotlinConf2023.days,
-                    )
-                ),
-                bookmarksUiState = QueryResult.Success(
-                    BookmarksUiState(
-                        kotlinConf2023.id,
-                        listOf(
-                            TestFixtures.sessionDetails,
-                            TestFixtures.sessionDetails.copy(title = "Adopting Kotlin at Google scale")
+                        bookmarksUiState = QueryResult.Success(
+                            BookmarksUiState(
+                                kotlinConf2023.id,
+                                listOf(
+                                    TestFixtures.sessionDetailsUiModel,
+                                    TestFixtures.sessionDetailsUiModel.copy(title = "Adopting Kotlin at Google scale")
+                                ),
+                                listOf(),
+                                LocalDateTime.of(2022, 1, 1, 1, 1).toKotlinLocalDateTime()
+                            )
                         ),
-                        listOf(),
-                        LocalDateTime.of(2022, 1, 1, 1, 1).toKotlinLocalDateTime()
                     )
                 ),
                 sessionSelected = {},
@@ -99,7 +99,7 @@ class ConferenceHomeScreenTest : ScreenshotTest() {
 
         takeScrollableScreenshot(
             timeTextMode = TimeTextMode.OnTop,
-            checks = { _ ->
+            checks = {
                 rule.onNodeWithText("KotlinConf 2023")
                     .assertIsDisplayed()
                     .assertHasNoClickAction()
@@ -116,9 +116,9 @@ class ConferenceHomeScreenTest : ScreenshotTest() {
                         kotlinConf2023.id,
                         kotlinConf2023.name,
                         kotlinConf2023.days,
+                        QueryResult.None
                     )
                 ),
-                bookmarksUiState = QueryResult.None,
                 sessionSelected = {},
                 daySelected = {},
                 onSettingsClick = {},
@@ -135,14 +135,13 @@ class ConferenceHomeScreenTest : ScreenshotTest() {
 
         takeScrollableScreenshot(
             timeTextMode = TimeTextMode.OnTop,
-            checks = { _ ->
+            checks = {
                 rule.onNodeWithText("Conference Days")
                     .assertIsDisplayed()
             }
         ) { columnState ->
             HomeScreen(
                 uiState = QueryResult.Loading,
-                bookmarksUiState = QueryResult.Loading,
                 sessionSelected = {},
                 daySelected = {},
                 onSettingsClick = {},
@@ -161,7 +160,7 @@ class ConferenceHomeScreenTest : ScreenshotTest() {
 
         takeScrollableScreenshot(
             timeTextMode = TimeTextMode.OnTop,
-            checks = { _ ->
+            checks = {
                 rule.onNodeWithText("Conference Days")
                     .assertIsDisplayed()
                     .assertHasNoClickAction()
@@ -174,7 +173,6 @@ class ConferenceHomeScreenTest : ScreenshotTest() {
         ) { columnState ->
             HomeScreen(
                 uiState = QueryResult.Loading,
-                bookmarksUiState = QueryResult.Loading,
                 sessionSelected = {},
                 daySelected = {},
                 onSettingsClick = {},

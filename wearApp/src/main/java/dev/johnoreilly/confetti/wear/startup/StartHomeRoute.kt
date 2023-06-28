@@ -4,7 +4,6 @@ package dev.johnoreilly.confetti.wear.startup
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -30,7 +29,6 @@ fun StartHomeRoute(
     val viewModel: StartViewModel = getViewModel()
 
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-    val bookmarksUiState by viewModel.bookmarksUiState.collectAsStateWithLifecycle()
 
     if (uiState is QueryResult.None) {
         val lifecycle = LocalLifecycleOwner.current
@@ -46,13 +44,12 @@ fun StartHomeRoute(
 
     HomeScreen(
         uiState = uiState,
-        bookmarksUiState = bookmarksUiState,
-        columnState = columnState,
-        daySelected = navigateToDay,
-        onBookmarksClick = navigateToBookmarks,
-        onSettingsClick = navigateToSettings,
         sessionSelected = {
             navigateToSession(it)
-        }
+        },
+        daySelected = navigateToDay,
+        onSettingsClick = navigateToSettings,
+        onBookmarksClick = navigateToBookmarks,
+        columnState = columnState
     )
 }

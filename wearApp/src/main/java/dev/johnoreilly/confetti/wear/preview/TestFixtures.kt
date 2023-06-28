@@ -6,6 +6,7 @@ import dev.johnoreilly.confetti.fragment.SessionDetails
 import dev.johnoreilly.confetti.fragment.SpeakerDetails
 import dev.johnoreilly.confetti.wear.proto.Theme
 import dev.johnoreilly.confetti.wear.ui.mapper.toSessionDetailsUiModel
+import dev.johnoreilly.confetti.wear.ui.mapper.toSpeakerDetailsUiModel
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 
@@ -89,6 +90,8 @@ object TestFixtures {
             __typename = "Speaker",
         )
     )
+    val JohnOreillyUiModel = JohnOreilly.toSpeakerDetailsUiModel()
+
 
     const val MartinUrl = "https://sessionize.com/image/7c96-400o400o2-UiWeCMZDxPejrFsozKmLYr.jpeg"
     val MartinBonnin = SessionDetails.Speaker(
@@ -108,6 +111,7 @@ object TestFixtures {
             __typename = "Speaker",
         )
     )
+    val MartinBonninUiModel = MartinBonnin.toSpeakerDetailsUiModel()
 
     val sessionDetails = SessionDetails(
         id = "368995",

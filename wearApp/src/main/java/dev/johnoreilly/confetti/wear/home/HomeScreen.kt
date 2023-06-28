@@ -41,6 +41,7 @@ import dev.johnoreilly.confetti.wear.components.SectionHeader
 import dev.johnoreilly.confetti.wear.components.SessionCard
 import dev.johnoreilly.confetti.wear.preview.TestFixtures
 import dev.johnoreilly.confetti.wear.ui.ConfettiThemeFixed
+import dev.johnoreilly.confetti.wear.ui.model.SessionDetailsUiModel
 import dev.johnoreilly.confetti.wear.ui.previews.WearPreviewDevices
 import dev.johnoreilly.confetti.wear.ui.previews.WearPreviewFontSizes
 import kotlinx.datetime.toJavaLocalDate
@@ -51,7 +52,6 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun HomeScreen(
     uiState: QueryResult<HomeUiState>,
-    bookmarksUiState: QueryResult<BookmarksUiState>,
     sessionSelected: (SessionDetailsKey) -> Unit,
     daySelected: (ConferenceDayKey) -> Unit,
     onSettingsClick: () -> Unit,
@@ -78,43 +78,44 @@ fun HomeScreen(
             }
         }
 
-        if (bookmarksUiState !is QueryResult.None) {
+        if (uiState !is QueryResult.Success || uiState.result.bookmarksUiState !is QueryResult.None) {
             item {
                 SectionHeader(stringResource(R.string.home_bookmarked_sessions))
             }
         }
 
-        if (bookmarksUiState is QueryResult.Success) {
-            val now = bookmarksUiState.result.now
+        if (uiState is QueryResult.Success) {
+            val homeUiState = uiState.result
 
-            items(bookmarksUiState.result.upcoming.take(3)) { session ->
-                key(session.id) {
-                    SessionCard(session, sessionSelected = {
-                        if (uiState is QueryResult.Success) {
-                            sessionSelected(SessionDetailsKey(uiState.result.conference, it))
-                        }
-                    }, now)
-                }
-            }
+            if (homeUiState.bookmarksUiState is QueryResult.Success) {
+                val bookmarksUiState = homeUiState.bookmarksUiState.result
+                val now = bookmarksUiState.now
 
-            if (!bookmarksUiState.result.hasUpcomingBookmarks) {
-                item {
-                    Text(stringResource(id = R.string.no_upcoming))
-                }
-            }
-
-            item {
-                OutlinedChip(
-                    label = { Text(stringResource(id = R.string.all_bookmarks)) },
-                    onClick = {
-                        if (uiState is QueryResult.Success) {
-                            onBookmarksClick(uiState.result.conference)
-                        }
+                items(bookmarksUiState.upcoming.take(3)) { session: SessionDetailsUiModel ->
+                    key(session.id) {
+                        SessionCard(session, sessionSelected = {
+                            sessionSelected(SessionDetailsKey(homeUiState.conference, it))
+                        }, now)
                     }
-                )
+                }
+
+                if (!bookmarksUiState.hasUpcomingBookmarks) {
+                    item {
+                        Text(stringResource(id = R.string.no_upcoming))
+                    }
+                }
+
+                item {
+                    OutlinedChip(
+                        label = { Text(stringResource(id = R.string.all_bookmarks)) },
+                        onClick = {
+                            onBookmarksClick(homeUiState.conference)
+                        }
+                    )
+                }
+            } else if (uiState is QueryResult.Loading) {
+                // TODO placeholders
             }
-        } else if (uiState is QueryResult.Loading) {
-            // TODO placeholders
         }
 
         item {
@@ -172,23 +173,23 @@ fun HomeListViewPreview() {
                     conference = TestFixtures.kotlinConf2023.id,
                     conferenceName = TestFixtures.kotlinConf2023.name,
                     confDates = TestFixtures.kotlinConf2023.days,
-                )
-            ),
-            bookmarksUiState = QueryResult.Success(
-                BookmarksUiState(
-                    conference = TestFixtures.kotlinConf2023.id,
-                    upcoming = listOf(
-                        TestFixtures.sessionDetailsUiModel
+                    bookmarksUiState = QueryResult.Success(
+                        BookmarksUiState(
+                            conference = TestFixtures.kotlinConf2023.id,
+                            upcoming = listOf(
+                                TestFixtures.sessionDetailsUiModel
+                            ),
+                            past = listOf(),
+                            now = LocalDateTime.of(2022, 1, 1, 1, 1).toKotlinLocalDateTime()
+                        )
                     ),
-                    past = listOf(),
-                    now = LocalDateTime.of(2022, 1, 1, 1, 1).toKotlinLocalDateTime()
                 )
             ),
-            columnState = ScalingLazyColumnDefaults.belowTimeText().create(),
             sessionSelected = {},
+            daySelected = {},
             onSettingsClick = {},
             onBookmarksClick = {},
-            daySelected = {},
+            columnState = ScalingLazyColumnDefaults.belowTimeText().create(),
         )
     }
 }

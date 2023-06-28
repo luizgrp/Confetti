@@ -17,6 +17,7 @@ import dev.johnoreilly.confetti.wear.home.navigation.ConferenceHomeDestination
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
@@ -29,19 +30,28 @@ class HomeViewModel(
     private val conference: String =
         ConferenceHomeDestination.fromNavArgs(savedStateHandle)
 
-    val uiState: StateFlow<QueryResult<HomeUiState>> =
-        homeUiStateFlow(repository, conference)
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), QueryResult.Loading)
-
-    val bookmarksUiState: StateFlow<QueryResult<BookmarksUiState>> =
+    private val bookmarksUiState: StateFlow<QueryResult<BookmarksUiState>> =
         bookmarksUiStateFlow(authentication, repository, conference)
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), QueryResult.Loading)
 
+    val uiState: StateFlow<QueryResult<HomeUiState>> =
+        homeUiStateFlow(repository, conference, bookmarksUiState)
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), QueryResult.Loading)
+
     companion object {
-        fun homeUiStateFlow(repository: ConfettiRepository, conference: String) =
-            repository.conferenceHomeData(conference).toUiState {
-                it.toUiState()
+        fun homeUiStateFlow(
+            repository: ConfettiRepository, conference: String,
+            bookmarksUiStateFlow: StateFlow<QueryResult<BookmarksUiState>>
+        ) = repository.conferenceHomeData(conference).toUiState {
+            it.toUiState()
+        }.combine(bookmarksUiStateFlow) { conferenceHomeData, bookmarksUiState ->
+            if (conferenceHomeData is QueryResult.Success) {
+                QueryResult.Success(conferenceHomeData.result.copy(bookmarksUiState = bookmarksUiState))
+            } else {
+                conferenceHomeData
             }
+        }
+
 
         fun bookmarksUiStateFlow(
             authentication: Authentication,
@@ -63,11 +73,13 @@ class HomeViewModel(
                 }
             }
 
-        fun GetConferenceDataQuery.Data.toUiState() = HomeUiState(
-            config.id,
-            config.name,
-            config.days,
-        )
+        private fun GetConferenceDataQuery.Data.toUiState() =
+            HomeUiState(
+                config.id,
+                config.name,
+                config.days,
+                QueryResult.None
+            )
     }
 }
 

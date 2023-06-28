@@ -8,7 +8,7 @@ import androidx.compose.ui.test.onNodeWithText
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import dev.johnoreilly.confetti.navigation.ConferenceDayKey
 import dev.johnoreilly.confetti.utils.QueryResult
-import dev.johnoreilly.confetti.wear.preview.TestFixtures.sessionDetails
+import dev.johnoreilly.confetti.wear.preview.TestFixtures.sessionDetailsUiModel
 import dev.johnoreilly.confetti.wear.preview.TestFixtures.sessionTime
 import dev.johnoreilly.confetti.wear.screenshots.ScreenshotTest
 import dev.johnoreilly.confetti.wear.sessions.SessionAtTime
@@ -37,7 +37,7 @@ class SessionsScreenTest : ScreenshotTest() {
                     sessionsByTime = listOf(
                         SessionAtTime(
                             sessionTime,
-                            listOf(sessionDetails)
+                            listOf(sessionDetailsUiModel)
                         )
                     ),
                     LocalDateTime.of(2022, 1, 1, 1, 1).toKotlinLocalDateTime()
@@ -65,7 +65,7 @@ class SessionsScreenTest : ScreenshotTest() {
                         sessionsByTime = listOf(
                             SessionAtTime(
                                 sessionTime,
-                                listOf(sessionDetails)
+                                listOf(sessionDetailsUiModel)
                             )
                         ),
                         LocalDateTime.of(2022, 1, 1, 1, 1).toKotlinLocalDateTime()

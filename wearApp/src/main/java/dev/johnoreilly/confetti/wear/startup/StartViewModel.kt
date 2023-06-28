@@ -28,25 +28,16 @@ class StartViewModel(
     phoneSettingsSync: PhoneSettingsSync,
     authentication: Authentication,
 ) : ViewModel() {
-    val conferenceParam: String? =
+    private val conferenceParam: String? =
         StartHomeDestination.fromNavArgs(savedStateHandle)?.ifEmpty { null }
 
-    val conferenceFlow: Flow<String> = if (conferenceParam != null) {
+    private val conferenceFlow: Flow<String> = if (conferenceParam != null) {
         flowOf(conferenceParam)
     } else {
         phoneSettingsSync.conferenceFlow
     }
 
-    val uiState: StateFlow<QueryResult<HomeUiState>> = conferenceFlow.flatMapLatest { conference ->
-        if (conference.isNotBlank()) {
-            homeUiStateFlow(repository, conference)
-        } else {
-            flowOf(QueryResult.None)
-        }
-    }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), QueryResult.Loading)
-
-    val bookmarksUiState: StateFlow<QueryResult<BookmarksUiState>> =
+    private val bookmarksUiState: StateFlow<QueryResult<BookmarksUiState>> =
         conferenceFlow.flatMapLatest { conference ->
             if (conference.isNotBlank()) {
                 HomeViewModel.bookmarksUiStateFlow(authentication, repository, conference)
@@ -55,5 +46,14 @@ class StartViewModel(
             }
         }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), QueryResult.Loading)
+
+    val uiState: StateFlow<QueryResult<HomeUiState>> = conferenceFlow.flatMapLatest { conference ->
+        if (conference.isNotBlank()) {
+            homeUiStateFlow(repository, conference, bookmarksUiState)
+        } else {
+            flowOf(QueryResult.None)
+        }
+    }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), QueryResult.Loading)
 }
 

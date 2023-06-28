@@ -27,7 +27,7 @@ class SessionCardTest : BaseScreenshotTest(
             }
         ) {
             SessionCard(
-                session = TestFixtures.sessionDetails,
+                session = TestFixtures.sessionDetailsUiModel,
                 sessionSelected = {},
                 currentTime = LocalDateTime.of(2022, 1, 1, 1, 1).toKotlinLocalDateTime()
             )
@@ -48,7 +48,7 @@ class SessionCardTest : BaseScreenshotTest(
             }
         ) {
             SessionCard(
-                session = TestFixtures.sessionDetails,
+                session = TestFixtures.sessionDetailsUiModel,
                 sessionSelected = {},
                 currentTime = TestFixtures.sessionDetails.startsAt
             )
@@ -69,14 +69,16 @@ class SessionCardTest : BaseScreenshotTest(
             }
         ) {
             SessionCard(
-                session = TestFixtures.sessionDetails.copy(speakers = listOf(
-                    TestFixtures.JohnOreilly,
-                    TestFixtures.MartinBonnin,
-                    TestFixtures.JohnOreilly,
-                    TestFixtures.MartinBonnin,
-                    TestFixtures.JohnOreilly,
-                    TestFixtures.MartinBonnin,
-                )),
+                session = TestFixtures.sessionDetailsUiModel.copy(
+                    speakers = listOf(
+                        TestFixtures.JohnOreillyUiModel,
+                        TestFixtures.MartinBonninUiModel,
+                        TestFixtures.JohnOreillyUiModel,
+                        TestFixtures.MartinBonninUiModel,
+                        TestFixtures.JohnOreillyUiModel,
+                        TestFixtures.MartinBonninUiModel,
+                    )
+                ),
                 sessionSelected = {},
                 currentTime = LocalDateTime.of(2022, 1, 1, 1, 1).toKotlinLocalDateTime()
             )
